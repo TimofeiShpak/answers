@@ -1,11 +1,11 @@
 import { observer } from "mobx-react";
 import store from '../store/store';
 
-interface Data {
+export interface Data {
   answers: [string],
   rightAnswer: [string],
   question: string,
-  isRight: boolean
+  isRight?: boolean
 }
 
 interface QuestionProps {
@@ -21,16 +21,22 @@ const Question = observer((props: QuestionProps) => {
   return (
     <form data-id={id} id={id} className="question">
     <p>{ `${props.index + 1}. ${data.question}` }</p>
-    {store.isCheck && 
-      (
+    { store.isCheck ? (
         !data.isRight ? (
-          <div className="wrong">
-            Ошибка! Правильный ответ: 
-            {[...data.rightAnswer].map((answer) => <p key={answer}>{answer}</p>)} 
-          </div>
-        ) : (
-          <p className="right">Правильно!</p>
+            <div className="wrong">
+              Ошибка! Правильный ответ: 
+              {[...data.rightAnswer].map((answer) => <p key={answer}>{answer}</p>)} 
+            </div>
+          ) : (
+            <p className="right">Правильно!</p>
         )
+      ) : (
+        <div className="guess">
+          <div className="guess__title">Подсказка</div>
+          <div className="guess__answers">
+            {[...data.rightAnswer].map((answer) => <p className="guess__text" key={answer}>{answer}</p>)} 
+          </div>
+        </div>
       )
     }
     <div>

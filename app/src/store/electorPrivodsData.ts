@@ -1,4 +1,4 @@
-let questions = {
+let electroPrivods = {
   '1' : {
     question: 'Уравнение движения электропривода',
     rightAnswer: ['MC=M-J dω/dt'],
@@ -539,4 +539,4 @@ let questions = {
   },
 }
 
-export { questions };
+export { electroPrivods };

@@ -1,7 +1,8 @@
 import { makeAutoObservable } from "mobx";
-import { questions } from "./data";
+import { electroPrivods } from "./electorPrivodsData";
+import { TAU } from "./TAU";
 
-interface Questions {
+interface Object {
   [key: string]: any;
 }
 
@@ -11,7 +12,9 @@ interface Link {
 }
 
 class Store {
-  questions: Questions = questions;
+  questions: Object = electroPrivods;
+  dataQuestions = Object.entries(electroPrivods);
+  showQuestions = this.dataQuestions.slice();
   shuffleQuestions:Array<any> = [];
   links: Array<Link> = [];
   score = 0;
@@ -22,6 +25,15 @@ class Store {
   numberQuestions = 64;
   isShowResults = false;
   date = new Date();
+  options: Object = {
+    'rightAnswer': { value: true, title: 'правильные ответы' },
+    'answers': { value: true, title: 'неправильные ответы' }
+  }
+  searchText = '';
+  typeQuestions: Object = {
+    'electroPrivods': { value: true, title: 'Электроприводы', data: electroPrivods },
+    'TAU': { value: false, title: 'ТАУ', data: TAU }
+  }
 
   constructor() {
     makeAutoObservable(this);
@@ -31,12 +43,17 @@ class Store {
     this.exit = this.exit.bind(this);
     this.changeNumberQuestions = this.changeNumberQuestions.bind(this);
     this.changeVisibleResults = this.changeVisibleResults.bind(this);
+    this.changeOption = this.changeOption.bind(this);
+    this.changeSearchText = this.changeSearchText.bind(this);
+    this.getData = this.getData.bind(this);
+    this.changeTest = this.changeTest.bind(this);
+    this.search = this.search.bind(this);
   }
 
   scrollToAnswer(event: React.MouseEvent<HTMLElement, MouseEvent>) {
     let questionListElement = document.querySelector(".question-list");
     let elem = event.target as HTMLElement;
-    if (document.documentElement.clientHeight < 800) {
+    if (document.documentElement.clientHeight < 700) {
       this.isShowResults = false;
     }
     if (elem.tagName === 'SPAN') {
@@ -55,7 +72,7 @@ class Store {
   }
 
   newOrderQuestions() {
-    this.shuffleQuestions = this.shuffle(Object.entries(this.questions));
+    this.shuffleQuestions = this.shuffle(this.dataQuestions);
     this.shuffleQuestions = this.shuffleQuestions.slice(0, this.numberQuestions).map((data) => { 
       data[1].answers = this.shuffle(data[1].answers);
       return data;
@@ -162,6 +179,57 @@ class Store {
 
   changeVisibleResults() {
     this.isShowResults = !this.isShowResults;
+  }
+
+  getId() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c === 'x' ? r : ((r & 0x3) | 0x8);
+        return v.toString(16);
+    });
+  }
+
+  changeOption(title: string, value: boolean) {
+    this.options[title].value = value;
+  }
+
+  changeTest(title: string, value: boolean) {
+    Object.keys(this.typeQuestions).forEach((key) => {
+      this.typeQuestions[key].value = false;
+    });
+    this.typeQuestions[title].value = value;
+    this.questions = this.typeQuestions[title].data;
+    this.dataQuestions = Object.entries(this.questions);
+    this.numberQuestions = this.dataQuestions.length;
+    this.showQuestions = this.dataQuestions.slice();
+    this.newOrderQuestions();
+  }
+
+  changeWidthInput(elem: HTMLInputElement) {
+    elem.style.width = '200px';
+    let width = Math.min(elem.scrollWidth, document.documentElement.clientWidth / 2);
+    elem.style.width = width + 'px';
+  }
+
+  search(text: string) {
+    this.showQuestions = this.dataQuestions.filter((data) => data[1].question.toLowerCase().includes(text));
+  }
+
+  changeSearchText(event: { target: HTMLInputElement }) {
+    let elem = event.target;
+    this.searchText = elem.value;
+    this.changeWidthInput(elem);
+    this.search(elem.value.toLowerCase());
+  }
+
+  getData(answers: string[], rightAnswer: string[]) {
+    answers = answers.length > 0 ? answers : rightAnswer;
+    if (!this.options.rightAnswer.value) {
+      answers = answers.filter((value) => !rightAnswer.includes(value));
+    }
+    if (!this.options.answers.value) {
+      answers = answers.filter((value) => rightAnswer.includes(value));
+    }
+    return answers;
   }
 }
 
