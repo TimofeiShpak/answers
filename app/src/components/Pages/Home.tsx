@@ -11,7 +11,7 @@ const Home = observer(() => {
     <div className="start-page">
       <div className="name-tests">
         <form className="options">
-          <p className="options__description">Выберите тест</p>
+          <p className="options__description">Выберите из тестов</p>
           {
             dataTypeQuestions.map((option) => {
               let onChange = () => changeTest(option[0], !option[1].value);
