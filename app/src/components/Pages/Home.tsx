@@ -4,14 +4,15 @@ import store from "src/store/store";
 
 
 const Home = observer(() => {
-  let { changeNumberQuestions, numberQuestions, start, typeQuestions, changeTest, search } = store;
+  let { changeNumberQuestions, numberQuestions, start, typeQuestions, changeTest, search, 
+    maxNumberQuestions, inputNumberQuestionsValue, blurNumberQuestions } = store;
   let dataTypeQuestions = Object.entries(typeQuestions);
 
   return (
     <div className="start-page">
       <div className="name-tests">
         <form className="options">
-          <p className="options__description">Выберите из тестов</p>
+          {/* <p className="options__description">Выберите из тестов</p>
           {
             dataTypeQuestions.map((option) => {
               let onChange = () => changeTest(option[0], !option[1].value);
@@ -22,7 +23,7 @@ const Home = observer(() => {
                 </div>
               )
             })
-          }
+          } */}
         </form>
       </div>
       <div>
@@ -37,10 +38,11 @@ const Home = observer(() => {
         <input 
           type="number" 
           min="1" 
-          max={numberQuestions} 
+          max={maxNumberQuestions} 
           id="number"
           onChange={changeNumberQuestions} 
-          value={numberQuestions}
+          onBlur={blurNumberQuestions}
+          value={inputNumberQuestionsValue}
         />
         <label htmlFor="number">Выберите количество вопросов</label>
       </div>

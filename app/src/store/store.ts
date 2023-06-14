@@ -1,6 +1,7 @@
 import { makeAutoObservable } from "mobx";
 import { electroPrivods } from "./electorPrivodsData";
 import { TAU } from "./TAU";
+import { anatomy } from "./anatomy";
 
 interface Object {
   [key: string]: any;
@@ -11,9 +12,24 @@ interface Link {
   index: number,
 }
 
+// function createObj(str) {
+//   let newObj = {};
+//   let values = str.split(/(а\)|б\)|в\)|г\))/g).filter(x => x !== 'а)' && x !== 'б)' && x !== 'в)' && x !== 'г)').map(x => x.replaceAll(/(\t|\n)/g, '').trim());
+//   newObj.question = values[0];
+//   newObj.rightAnswer = [values[1]];
+//   newObj.answers = values.slice(1);
+//   return newObj;
+// }
+
+// o = {};
+// s.split(/\d{1,3}\./g).map((x,i) => createObj(x)).filter(x => !!x.question).map((x,i) => o[i+1] = x)
+
+const maxNumberQuestions = Object.entries(anatomy).length;
+const defaultNumberQuestions = 60;
+
 class Store {
-  questions: Object = electroPrivods;
-  dataQuestions = Object.entries(electroPrivods);
+  questions: Object = anatomy;
+  dataQuestions = Object.entries(anatomy);
   showQuestions = this.dataQuestions.slice();
   shuffleQuestions:Array<any> = [];
   links: Array<Link> = [];
@@ -22,16 +38,20 @@ class Store {
   isStart = false;
   isProgramScroll = true;
   time = { hours: '00', seconds: '00', minutes: '00' };
-  numberQuestions = 64;
+  numberQuestions = defaultNumberQuestions;
+  maxNumberQuestions = maxNumberQuestions;
+  inputNumberQuestionsValue = `${defaultNumberQuestions}`;
   isShowResults = false;
   date = new Date();
+  rightAnswers: Object = {};
   options: Object = {
     'rightAnswer': { value: true, title: 'правильные ответы' },
     'answers': { value: true, title: 'неправильные ответы' }
   }
   searchText = '';
   typeQuestions: Object = {
-    'electroPrivods': { value: true, title: 'Электроприводы', data: electroPrivods },
+    'anatomy': { value: true, title: 'Анатомия и физиология человека', data: anatomy },
+    'electroPrivods': { value: false, title: 'Электроприводы', data: electroPrivods },
     'TAU': { value: false, title: 'ТАУ', data: TAU }
   }
 
@@ -42,12 +62,15 @@ class Store {
     this.scrollToAnswer = this.scrollToAnswer.bind(this);
     this.exit = this.exit.bind(this);
     this.changeNumberQuestions = this.changeNumberQuestions.bind(this);
+    this.blurNumberQuestions = this.blurNumberQuestions.bind(this);
     this.changeVisibleResults = this.changeVisibleResults.bind(this);
     this.changeOption = this.changeOption.bind(this);
     this.changeSearchText = this.changeSearchText.bind(this);
     this.getData = this.getData.bind(this);
     this.changeTest = this.changeTest.bind(this);
     this.search = this.search.bind(this);
+    this.designationAnswer = this.designationAnswer.bind(this);
+    this.check = this.check.bind(this);
   }
 
   scrollToAnswer(event: React.MouseEvent<HTMLElement, MouseEvent>) {
@@ -117,9 +140,9 @@ class Store {
 
   designationAnswer(isRight: Array<number>, id: string, rightAnswer: Array<string>, index: number) {
     if (isRight.length === rightAnswer.length && Math.min(...isRight)) {
-      this.questions[id].isRight = true; 
+      this.rightAnswers[id] = true; 
     } else {
-      this.questions[id].isRight = false; 
+      this.rightAnswers[id] = false; 
       this.links.push({ id, index });
     }
   }
@@ -128,6 +151,7 @@ class Store {
     this.score = 0;
     this.isShowResults = true;
     let forms = document.querySelectorAll('form');
+    this.rightAnswers = {};
     forms.forEach((data, index) => {
       let id = data.dataset.id || '';
       let rightAnswer = this.questions[id].rightAnswer;
@@ -174,7 +198,16 @@ class Store {
   }
 
   changeNumberQuestions(event: { target: HTMLInputElement }) {
-    this.numberQuestions = Math.max(0, Math.min(+event.target.value, 64));
+    this.inputNumberQuestionsValue = event.target.value
+    if (event.target.value) {
+      let checkedValue = Math.max(1, Math.min(+event.target.value, maxNumberQuestions));
+      this.numberQuestions = checkedValue;
+      this.inputNumberQuestionsValue = `${checkedValue}`;
+    }
+  }
+
+  blurNumberQuestions() {
+    this.inputNumberQuestionsValue = `${this.numberQuestions}`;
   }
 
   changeVisibleResults() {
@@ -199,7 +232,7 @@ class Store {
     this.typeQuestions[title].value = value;
     this.questions = this.typeQuestions[title].data;
     this.dataQuestions = Object.entries(this.questions);
-    this.numberQuestions = this.dataQuestions.length;
+    this.numberQuestions = defaultNumberQuestions;
     this.showQuestions = this.dataQuestions.slice();
     this.newOrderQuestions();
   }

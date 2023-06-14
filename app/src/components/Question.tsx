@@ -17,12 +17,13 @@ const Question = observer((props: QuestionProps) => {
   let data = props.data[1];
   let id = props.data[0];
   let type = data.rightAnswer.length === 1 ? 'radio' :  'checkbox';
+  let { isCheck, rightAnswers } = store;
 
   return (
     <form data-id={id} id={id} className="question">
     <p>{ `${props.index + 1}. ${data.question}` }</p>
-    { store.isCheck ? (
-        !data.isRight ? (
+    { isCheck ? (
+        !rightAnswers[id] ? (
             <div className="wrong">
               Ошибка! Правильный ответ: 
               {[...data.rightAnswer].map((answer) => <p key={answer}>{answer}</p>)} 
