@@ -2,6 +2,7 @@ import { makeAutoObservable } from "mobx";
 import { electroPrivods } from "./electorPrivodsData";
 import { TAU } from "./TAU";
 import { anatomy } from "./anatomy";
+import { gistology } from './gistology';
 
 interface Object {
   [key: string]: any;
@@ -23,13 +24,13 @@ interface Link {
 
 // o = {};
 // s.split(/\d{1,3}\./g).map((x,i) => createObj(x)).filter(x => !!x.question).map((x,i) => o[i+1] = x)
-
-const maxNumberQuestions = Object.entries(anatomy).length;
+let dataObj = gistology
+const maxNumberQuestions = Object.entries(dataObj).length;
 const defaultNumberQuestions = 60;
 
 class Store {
-  questions: Object = anatomy;
-  dataQuestions = Object.entries(anatomy);
+  questions: Object = dataObj;
+  dataQuestions = Object.entries(dataObj);
   showQuestions = this.dataQuestions.slice();
   shuffleQuestions:Array<any> = [];
   links: Array<Link> = [];
@@ -52,7 +53,8 @@ class Store {
   typeQuestions: Object = {
     'anatomy': { value: true, title: 'Анатомия и физиология человека', data: anatomy },
     'electroPrivods': { value: false, title: 'Электроприводы', data: electroPrivods },
-    'TAU': { value: false, title: 'ТАУ', data: TAU }
+    'TAU': { value: false, title: 'ТАУ', data: TAU },
+    gistology: { value: true, title: 'Лабораторная_диагностика', data: gistology },
   }
 
   constructor() {
