@@ -19,6 +19,23 @@ const Question = observer((props: QuestionProps) => {
   let type = data.rightAnswer.length === 1 ? 'radio' :  'checkbox';
   let { isCheck, rightAnswers } = store;
 
+  let checkIsCorrect = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    let clickElem = (event.target as HTMLElement);
+    let textElem = clickElem.closest('.text_left');
+
+    if (textElem) {
+      let inputElem = textElem.querySelector('input');
+      if (inputElem) {
+        let correct = inputElem.dataset.correct;
+        if (correct === "true") {
+          textElem.classList.add('right');
+        } else {
+          textElem.classList.add('wrong');
+        }
+      }
+    }
+  }
+
   return (
     <form data-id={id} id={id} className="question">
     <p>{ `${props.index + 1}. ${data.question}` }</p>
@@ -43,9 +60,10 @@ const Question = observer((props: QuestionProps) => {
     <div>
       { data.answers.length > 0 ? ( 
           data.answers.map((answer) => {
+            let correct = data.rightAnswer.includes(answer)
             return (
-              <div className="text_left" key={answer}>
-                <input type={type} name={id} value={answer} id={answer+id} />
+              <div className="text_left" key={answer} onClick={checkIsCorrect}>
+                <input type={type} name={id} value={answer} id={answer+id} data-correct={correct} />
                 <label htmlFor={answer+id}>{answer}</label>
               </div>
             )

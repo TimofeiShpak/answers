@@ -3,6 +3,7 @@ import { electroPrivods } from "./electorPrivodsData";
 import { TAU } from "./TAU";
 import { anatomy } from "./anatomy";
 import { gistology } from './gistology';
+import { clinika } from './clinika';
 
 interface Object {
   [key: string]: any;
@@ -25,7 +26,7 @@ interface Link {
 // o = {};
 // s.split(/\d{1,3}\./g).map((x,i) => createObj(x)).filter(x => !!x.question).map((x,i) => o[i+1] = x)
 let dataObj = gistology
-const maxNumberQuestions = Object.entries(dataObj).length;
+let maxNumberQuestions = Object.entries(dataObj).length;
 const defaultNumberQuestions = 60;
 
 class Store {
@@ -51,10 +52,11 @@ class Store {
   }
   searchText = '';
   typeQuestions: Object = {
-    'anatomy': { value: true, title: 'Анатомия и физиология человека', data: anatomy },
-    'electroPrivods': { value: false, title: 'Электроприводы', data: electroPrivods },
-    'TAU': { value: false, title: 'ТАУ', data: TAU },
-    gistology: { value: true, title: 'Лабораторная_диагностика', data: gistology },
+    // 'anatomy': { value: false, title: 'Анатомия и физиология человека', data: anatomy },
+    // 'electroPrivods': { value: false, title: 'Электроприводы', data: electroPrivods },
+    // 'TAU': { value: false, title: 'ТАУ', data: TAU },
+    gistology: { value: true, title: 'Гистологические исследования', data: gistology },
+    clinika: { value: false, title: 'Общеклинические исследования', data: clinika },
   }
 
   constructor() {
@@ -202,7 +204,7 @@ class Store {
   changeNumberQuestions(event: { target: HTMLInputElement }) {
     this.inputNumberQuestionsValue = event.target.value
     if (event.target.value) {
-      let checkedValue = Math.max(1, Math.min(+event.target.value, maxNumberQuestions));
+      let checkedValue = Math.max(1, Math.min(+event.target.value, this.maxNumberQuestions));
       this.numberQuestions = checkedValue;
       this.inputNumberQuestionsValue = `${checkedValue}`;
     }
@@ -235,8 +237,10 @@ class Store {
     this.questions = this.typeQuestions[title].data;
     this.dataQuestions = Object.entries(this.questions);
     this.numberQuestions = defaultNumberQuestions;
+    this.inputNumberQuestionsValue = `${defaultNumberQuestions}`;
     this.showQuestions = this.dataQuestions.slice();
     this.newOrderQuestions();
+    this.maxNumberQuestions = this.dataQuestions.length;
   }
 
   changeWidthInput(elem: HTMLInputElement) {
