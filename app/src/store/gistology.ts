@@ -743,13 +743,6 @@ let gistology = {
             "при приёме"
         ]
     },
-    "62": {
-        "question": "",
-        "rightAnswer": [
-            ""
-        ],
-        "answers": []
-    },
     "63": {
         "question": "ПОСЛЕ ФИКСАЦИИ В ФОРМАЛИНЕ ТКАНИ ПРОМЫВАЮТ",
         "rightAnswer": [
