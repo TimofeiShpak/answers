@@ -4,6 +4,7 @@ import { TAU } from "./TAU";
 import { anatomy } from "./anatomy";
 import { gistology } from './gistology';
 import { clinika } from './clinika';
+import { sanitary } from './sanitary';
 
 interface Object {
   [key: string]: any;
@@ -13,6 +14,28 @@ interface Link {
   id: string,
   index: number,
 }
+
+// let answers = (text: String) => text.split(/[aбвгдАБВГBb6]\./).slice(1).map(x => x.replace(/;/g, '').replace(/\n/g, ' ').trim())
+// let questions = (text: String) => {
+//   let obj = {} as any;
+//   text.split(/\d\d\./)
+//   .slice(1)
+//   .map(q => q.split(/[aбвгдАБВГBb6erежз]\./).map(x => x.replace(/;/g, '').replace(/\n/g, ' ').trim()))
+//   .map((i, index) => {
+//       let rI = i.findIndex(x => x.includes("V"));
+//       i = i.map(x => x.replace('V', '').trim());
+//       let r = rI !== -1 && i[rI + 1] || '';
+//       let q = i[0];
+//       obj[index+195] = {
+//           "question": q,
+//           "rightAnswer": [r],
+//           "answers": i.slice(1)
+//       }
+//   })
+//   const json = JSON.stringify(obj, null, 4);
+//   navigator.clipboard.writeText(json.slice(1, -1))
+//   return json.slice(1, -1)
+// }
 
 // function createObj(str) {
 //   let newObj = {};
@@ -25,7 +48,7 @@ interface Link {
 
 // o = {};
 // s.split(/\d{1,3}\./g).map((x,i) => createObj(x)).filter(x => !!x.question).map((x,i) => o[i+1] = x)
-let dataObj = gistology
+let dataObj = sanitary
 let maxNumberQuestions = Object.entries(dataObj).length;
 const defaultNumberQuestions = 60;
 
@@ -55,9 +78,11 @@ class Store {
     // 'anatomy': { value: false, title: 'Анатомия и физиология человека', data: anatomy },
     // 'electroPrivods': { value: false, title: 'Электроприводы', data: electroPrivods },
     // 'TAU': { value: false, title: 'ТАУ', data: TAU },
-    gistology: { value: true, title: 'Гистологические исследования', data: gistology },
-    clinika: { value: false, title: 'Общеклинические исследования', data: clinika },
-  }
+    // gistology: { value: true, title: 'Гистологические исследования', data: gistology },
+    // clinika: { value: false, title: 'Общеклинические исследования', data: clinika },
+    sanitary: { value: true, title: 'Санитарное дело', data: sanitary },
+  };
+  questionText = '';
 
   constructor() {
     makeAutoObservable(this);

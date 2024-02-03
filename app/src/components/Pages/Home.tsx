@@ -2,7 +2,6 @@ import { observer } from "mobx-react";
 import { Link } from "react-router-dom";
 import store from "src/store/store";
 
-
 const Home = observer(() => {
   let { changeNumberQuestions, numberQuestions, start, typeQuestions, changeTest, search, 
     maxNumberQuestions, inputNumberQuestionsValue, blurNumberQuestions } = store;

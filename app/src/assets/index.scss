@@ -37,6 +37,8 @@ button {
   text-align: left;
   display: flex;
   align-items: center;
+  border-bottom: 1px solid;
+  margin-bottom: 10px;
 }
 
 label {
@@ -152,6 +154,8 @@ footer {
 
 .answer {
   list-style: inside;
+  margin-bottom: 10px;
+  border-bottom: 1px solid;
 }
 
 .options {

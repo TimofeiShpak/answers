@@ -13,7 +13,8 @@ const Results = observer(() => {
           </button>
           { isShowResults &&
             <div>
-              <p>Ваши баллы: {`${score} : ${numberQuestions}`} </p>
+              <p>Ваши баллы: {`${score} : ${numberQuestions}`}</p>
+              <span>Процент правильных ответов {`${(score/numberQuestions * 100).toFixed(1)}`}%</span>
               <div className="wrong-results" onClick={scrollToAnswer}>
                 <div>Неправильные ответы: </div>
                 { links.map((link) => {
