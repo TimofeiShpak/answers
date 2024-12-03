@@ -5,6 +5,7 @@ import { anatomy } from "./anatomy";
 import { gistology } from './gistology';
 import { clinika } from './clinika';
 import { sanitary } from './sanitary';
+import { biochimiya } from './biochimiya';
 
 interface Object {
   [key: string]: any;
@@ -48,7 +49,7 @@ interface Link {
 
 // o = {};
 // s.split(/\d{1,3}\./g).map((x,i) => createObj(x)).filter(x => !!x.question).map((x,i) => o[i+1] = x)
-let dataObj = sanitary
+let dataObj = biochimiya
 let maxNumberQuestions = Object.entries(dataObj).length;
 const defaultNumberQuestions = 60;
 
@@ -80,7 +81,8 @@ class Store {
     // 'TAU': { value: false, title: 'ТАУ', data: TAU },
     // gistology: { value: true, title: 'Гистологические исследования', data: gistology },
     // clinika: { value: false, title: 'Общеклинические исследования', data: clinika },
-    sanitary: { value: true, title: 'Санитарное дело', data: sanitary },
+    // sanitary: { value: true, title: 'Санитарное дело', data: sanitary },
+    biochimiya: { value: true, title: 'Биохимия', data: biochimiya },
   };
   questionText = '';
 
@@ -104,14 +106,16 @@ class Store {
 
   scrollToAnswer(event: React.MouseEvent<HTMLElement, MouseEvent>) {
     let questionListElement = document.querySelector(".question-list");
-    let elem = event.target as HTMLElement;
-    if (document.documentElement.clientHeight < 700) {
-      this.isShowResults = false;
-    }
-    if (elem.tagName === 'SPAN') {
-      let answer = document.getElementById(`${elem.dataset.id}`);
-      let top = answer?.offsetTop || 50;
-      questionListElement?.scrollTo(0, top - 50);
+    if (event.target instanceof HTMLElement) {
+      let elem = event.target;
+      if (document.documentElement.clientHeight < 700) {
+        this.isShowResults = false;
+      }
+      if (elem.tagName === 'SPAN') {
+        let answer = document.getElementById(`${elem.dataset.id}`);
+        let top = answer?.offsetTop || 50;
+        questionListElement?.scrollTo(0, top - 50);
+      }
     }
   }
 

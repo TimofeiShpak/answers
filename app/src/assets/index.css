@@ -162,10 +162,10 @@ footer {
   display: flex;
   justify-content: center;
   margin-bottom: 10px;
+}
 
-  &__description {
-    margin-right: 10px;
-  }
+.options__description {
+  margin-right: 10px;
 }
 
 .answers__input {

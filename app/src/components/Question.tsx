@@ -20,21 +20,24 @@ const Question = observer((props: QuestionProps) => {
   let { isCheck, rightAnswers } = store;
 
   let checkIsCorrect = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
-    let clickElem = (event.target as HTMLElement);
-    let textElem = clickElem.closest('.text_left');
+    if (event.target instanceof HTMLElement) {
+      let textElem = event.target.closest('.text_left');
 
-    if (textElem) {
-      let inputElem = textElem.querySelector('input');
-      if (inputElem) {
-        let correct = inputElem.dataset.correct;
-        if (correct === "true") {
-          textElem.classList.add('right');
-        } else {
-          textElem.classList.add('wrong');
+      if (textElem) {
+        let inputElem = textElem.querySelector('input');
+        if (inputElem) {
+          let correct = inputElem.dataset.correct;
+          if (correct === "true") {
+            textElem.classList.add('right');
+          } else {
+            textElem.classList.add('wrong');
+          }
         }
       }
     }
   }
+    
+    
 
   return (
     <form data-id={id} id={id} className="question">
