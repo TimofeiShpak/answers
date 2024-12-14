@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 import AnswerItem from "../AnswerItem";
 
 const Answers = observer(() => {
-  let { exit, showQuestions, getId, options, changeOption, searchText, changeSearchText } = store;
+  let { exit, showQuestions, getId, options, changeOption, searchText, changeSearchText,
+    testName } = store;
   let dataOptions = Object.entries(options);
 
   return (
@@ -20,6 +21,7 @@ const Answers = observer(() => {
             value={searchText} 
             onChange={changeSearchText}/>
         </div>
+        <div>{testName}</div>
         <form className="options">
           <p className="options__description">Выберите элементы которые хотите показать: </p>
           {

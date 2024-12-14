@@ -49,24 +49,30 @@ interface Link {
 
 // o = {};
 // s.split(/\d{1,3}\./g).map((x,i) => createObj(x)).filter(x => !!x.question).map((x,i) => o[i+1] = x)
-let dataObj = biochimiya
-let maxNumberQuestions = Object.entries(dataObj).length;
-const defaultNumberQuestions = 60;
+
+let biochimiya1 = Object.fromEntries(Object.entries(biochimiya).slice(0,100));
+let biochimiya2 = Object.fromEntries(Object.entries(biochimiya).slice(100,200));
+let biochimiya3 = Object.fromEntries(Object.entries(biochimiya).slice(200,300));
+let biochimiya4 = Object.fromEntries(Object.entries(biochimiya).slice(300,400));
+let biochimiya5 = Object.fromEntries(Object.entries(biochimiya).slice(400,500));
+let biochimiya6 = Object.fromEntries(Object.entries(biochimiya).slice(500,603));
+
+const defaultNumberQuestions = 100;
 
 class Store {
-  questions: Object = dataObj;
-  dataQuestions = Object.entries(dataObj);
-  showQuestions = this.dataQuestions.slice();
+  testName = '';
+  questions: Object = {};
+  dataQuestions: [string, any][] = [];
+  showQuestions: [string, any][] = [];
   shuffleQuestions:Array<any> = [];
   links: Array<Link> = [];
   score = 0;
   isCheck = false;
   isStart = false;
   isProgramScroll = true;
+  isCanSelect = false;
   time = { hours: '00', seconds: '00', minutes: '00' };
   numberQuestions = defaultNumberQuestions;
-  maxNumberQuestions = maxNumberQuestions;
-  inputNumberQuestionsValue = `${defaultNumberQuestions}`;
   isShowResults = false;
   date = new Date();
   rightAnswers: Object = {};
@@ -82,9 +88,22 @@ class Store {
     // gistology: { value: true, title: 'Гистологические исследования', data: gistology },
     // clinika: { value: false, title: 'Общеклинические исследования', data: clinika },
     // sanitary: { value: true, title: 'Санитарное дело', data: sanitary },
-    biochimiya: { value: true, title: 'Биохимия', data: biochimiya },
+    biochimiya1: { value: true, title: 'Биохимия 1-100', data: biochimiya1 },
+    biochimiya2: { value: false, title: 'Биохимия 101-200', data: biochimiya2 },
+    biochimiya3: { value: false, title: 'Биохимия 201-300', data: biochimiya3 },
+    biochimiya4: { value: false, title: 'Биохимия 301-400', data: biochimiya4 },
+    biochimiya5: { value: false, title: 'Биохимия 401-500', data: biochimiya5 },
+    biochimiya6: { value: false, title: 'Биохимия 501-603', data: biochimiya6 },
+    biochimiya: { value: false, title: 'Биохимия выбор определенных вопросов', data: biochimiya, 
+      isCanSelect: true },
   };
   questionText = '';
+  rangeNumberQuestions: Object = {
+    "start": 1,
+    "end": defaultNumberQuestions
+  };
+  keyTest = "";
+  maxNumberQuestions = defaultNumberQuestions;
 
   constructor() {
     makeAutoObservable(this);
@@ -93,7 +112,6 @@ class Store {
     this.scrollToAnswer = this.scrollToAnswer.bind(this);
     this.exit = this.exit.bind(this);
     this.changeNumberQuestions = this.changeNumberQuestions.bind(this);
-    this.blurNumberQuestions = this.blurNumberQuestions.bind(this);
     this.changeVisibleResults = this.changeVisibleResults.bind(this);
     this.changeOption = this.changeOption.bind(this);
     this.changeSearchText = this.changeSearchText.bind(this);
@@ -102,6 +120,9 @@ class Store {
     this.search = this.search.bind(this);
     this.designationAnswer = this.designationAnswer.bind(this);
     this.check = this.check.bind(this);
+    this.changeRangeNumberQuestions = this.changeRangeNumberQuestions.bind(this);
+    this.changeSelectedQuestions = this.changeSelectedQuestions.bind(this);
+    this.changeTest("biochimiya1", true);
   }
 
   scrollToAnswer(event: React.MouseEvent<HTMLElement, MouseEvent>) {
@@ -131,6 +152,9 @@ class Store {
     this.shuffleQuestions = this.shuffle(this.dataQuestions);
     this.shuffleQuestions = this.shuffleQuestions.slice(0, this.numberQuestions).map((data) => { 
       data[1].answers = this.shuffle(data[1].answers);
+      if (data[1].subQuestions) {
+        data[1].subQuestions.questions = this.shuffle(data[1].subQuestions.questions);
+      }
       return data;
     });
   }
@@ -144,6 +168,14 @@ class Store {
       inputs.forEach((input) => { 
         input.checked = false; 
         input.value = ''; 
+        input.classList.remove("right");
+        input.classList.remove("wrong");
+      });
+      let selects = document.querySelectorAll('select');
+      selects.forEach(x => {
+        x.value = ''
+        x.classList.remove("right-select");
+        x.classList.remove("wrong-select");
       });
       this.start();
     }
@@ -171,8 +203,8 @@ class Store {
     return isRight;
   }
 
-  designationAnswer(isRight: Array<number>, id: string, rightAnswer: Array<string>, index: number) {
-    if (isRight.length === rightAnswer.length && Math.min(...isRight)) {
+  designationAnswer(isRight: Array<number>, id: string, rightAnswer: Array<string|number>, index: number) {
+    if (isRight.length >= rightAnswer.length && Math.min(...isRight)) {
       this.rightAnswers[id] = true; 
     } else {
       this.rightAnswers[id] = false; 
@@ -188,10 +220,24 @@ class Store {
     forms.forEach((data, index) => {
       let id = data.dataset.id || '';
       let rightAnswer = this.questions[id].rightAnswer;
-      let isRight = this.collectAnswers(data, rightAnswer);
-      this.designationAnswer(isRight, id, rightAnswer, index+1);
-      let increaseValue = isRight.filter((value) => !!value).length / rightAnswer.length || 0;
-      this.score += +increaseValue.toFixed(2);
+      if (!rightAnswer) {
+        let isRight = [...data.querySelectorAll("select")].map(x => {
+          let rightAnswer = x.dataset.rightanswer;
+          let value = x.value;
+          return value === rightAnswer ? 1 : 0
+        })
+        this.designationAnswer(isRight, id, isRight, index+1);
+        let increaseValue = isRight.filter((value) => !!value).length == isRight.length ? 1 : 0;
+        if (increaseValue > 0) {
+          console.log(increaseValue, id)
+        }
+        this.score += +increaseValue.toFixed(2);
+      } else {
+        let isRight = this.collectAnswers(data, rightAnswer);
+        this.designationAnswer(isRight, id, rightAnswer, index+1);
+        let increaseValue = isRight.filter((value) => !!value).length / rightAnswer.length || 0;
+        this.score += +increaseValue.toFixed(2);
+      }
     });
   }
 
@@ -231,16 +277,15 @@ class Store {
   }
 
   changeNumberQuestions(event: { target: HTMLInputElement }) {
-    this.inputNumberQuestionsValue = event.target.value
+    this.numberQuestions = +event.target.value
     if (event.target.value) {
-      let checkedValue = Math.max(1, Math.min(+event.target.value, this.maxNumberQuestions));
+      let checkedValue = Math.max(1, Math.min(+event.target.value, this.dataQuestions.length));
       this.numberQuestions = checkedValue;
-      this.inputNumberQuestionsValue = `${checkedValue}`;
+      if (this.rangeNumberQuestions.start < 1) {
+        this.rangeNumberQuestions.start = 1
+      }
+      this.rangeNumberQuestions.end = this.rangeNumberQuestions.start + checkedValue - 1;
     }
-  }
-
-  blurNumberQuestions() {
-    this.inputNumberQuestionsValue = `${this.numberQuestions}`;
   }
 
   changeVisibleResults() {
@@ -258,18 +303,30 @@ class Store {
     this.options[title].value = value;
   }
 
+  changeSelectedQuestions(questions: Object) {
+    let { start, end } = this.rangeNumberQuestions
+    this.dataQuestions = Object.entries(questions).slice(start - 1, end);
+    this.questions = Object.fromEntries(this.dataQuestions);
+    this.showQuestions = this.dataQuestions.slice();
+  }
+
   changeTest(title: string, value: boolean) {
     Object.keys(this.typeQuestions).forEach((key) => {
       this.typeQuestions[key].value = false;
     });
     this.typeQuestions[title].value = value;
-    this.questions = this.typeQuestions[title].data;
-    this.dataQuestions = Object.entries(this.questions);
-    this.numberQuestions = defaultNumberQuestions;
-    this.inputNumberQuestionsValue = `${defaultNumberQuestions}`;
-    this.showQuestions = this.dataQuestions.slice();
+    let questions = this.typeQuestions[title].data;
+    this.maxNumberQuestions = Object.entries(questions).length;
+
+    this.rangeNumberQuestions.end = this.maxNumberQuestions;
+    this.rangeNumberQuestions.start = 1;
+    this.changeSelectedQuestions(questions);
+    this.numberQuestions = this.dataQuestions.length;
+
+    this.testName = this.typeQuestions[title].title;
+    this.isCanSelect = this.typeQuestions[title].isCanSelect || false;
     this.newOrderQuestions();
-    this.maxNumberQuestions = this.dataQuestions.length;
+    this.keyTest = title;
   }
 
   changeWidthInput(elem: HTMLInputElement) {
@@ -287,6 +344,24 @@ class Store {
     this.searchText = elem.value;
     this.changeWidthInput(elem);
     this.search(elem.value.toLowerCase());
+  }
+
+  changeRangeNumberQuestions(event: { target: HTMLInputElement }, type: string) {
+    let elem = event.target;
+    let value = +elem.value;
+    if (type != null && value > 0) {
+      if (this.maxNumberQuestions >= value) {
+        this.rangeNumberQuestions[type] = value;
+        let { start, end } = this.rangeNumberQuestions;
+        if (start > 0 && end > 0) {
+          this.numberQuestions = end - start + 1;
+        }
+        let questions = this.typeQuestions[this.keyTest].data;
+        this.changeSelectedQuestions(questions);
+      }
+    } else {
+      this.rangeNumberQuestions[type] = "";
+    }
   }
 
   getData(answers: string[], rightAnswer: string[]) {

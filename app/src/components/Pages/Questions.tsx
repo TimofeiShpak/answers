@@ -10,7 +10,7 @@ const Questions = observer(() => {
 
   return (
     <div className="questions">
-       <header>
+      <header>
         <Time />
       </header>
       <QuestionList />

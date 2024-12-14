@@ -3,18 +3,23 @@ import { observer } from "mobx-react";
 import store from "src/store/store";
 
 const AnswerItem = observer((props) => {
-  let { question, answers, rightAnswer } = props.data;
+  let { question, answers, rightAnswer, subQuestions } = props.data;
   let { getData } = store;
-  answers = getData(answers, rightAnswer);
+  let showQuestions = answers.slice();
+  if (subQuestions) {
+    showQuestions = subQuestions.questions.map(x => `${x.name} - ${x.rightAnswer}`);
+  } else {
+    showQuestions = getData(answers, rightAnswer);
+  }
 
   return (
-    <div className="question">
+    <div className="question pre">
       <p>{props.index+1}.{ question }</p>
       <ul>
-        { answers.map((answer) => {
+        { showQuestions.map((answer) => {
             let className = classNames({
               "answer": true,
-              "right-answer": rightAnswer.includes(answer)
+              "right-answer": rightAnswer && rightAnswer.includes(answer) || false
             });
             return <li className={className} key={answer}>{ answer }</li>
           })

@@ -14272,6 +14272,8 @@
 	let strings = [...document.querySelectorAll("p")];
 	let textStrings = strings.map(x => x.textContent.trim());
 	let questions = [];
+	let fixedQuestions = [254, 279, 284, 288, 297, 303, 304, 307, 309, 313, 356, 525, 529, 530, 534, 535, 536, 537, 538, 540, 544, 551, 554, 558, 561, 565, 568, 570, 575, 576, 577, 578, 583, 584, 585, 586, 593, 596]
+	let bugQuestions = [];
 	for (let i = 0; i < textStrings.length; i++) {
 		let reg = new RegExp(/^\d+\./);
 		let obj = {
@@ -14292,7 +14294,7 @@
 				if (reg.test(answer)) {
 					let answerMatch = [...answer.match(reg)];
 					let answerNumber = parseInt(answerMatch[0]);
-					if (answerNumber > numberQuestion) {
+					if (answerNumber >= numberQuestion - 10) {
 						isAnswer = false
 						i--
 					}
@@ -14305,6 +14307,14 @@
 						if (elemBold) {
 							obj.rightAnswer.push(answer)
 						}
+					}
+				}
+				let regNumber = new RegExp(/^\d+/);
+				if (regNumber.test(answer)) {
+					let answerMatch = [...answer.match(regNumber)];
+					let answerNumber = parseInt(answerMatch[0]);
+					if (answerNumber < numberQuestion - 10 && !fixedQuestions.includes(numberQuestion)) {
+						bugQuestions.push(numberQuestion)
 					}
 				}
 			} else {
@@ -14320,6 +14330,7 @@
 		opt[i+1] = questions[i]
 	}
 	console.log(opt);
+	console.log(new Set(bugQuestions))
 	// let e = "1. 234";
 	// let reg = new RegExp(/^\d\./);
 	// reg.test(e);

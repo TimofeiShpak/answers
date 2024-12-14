@@ -199,14 +199,47 @@ footer {
   display: block;
 }
 
-@media (max-width: 900px) {
-  .options {
-    flex-direction: column;
-  }
+.options {
+  flex-direction: column;
+}
 
-  .question-answers-list {
-    margin-top: 145px;
-  }
+.question-answers-list {
+  margin-top: 145px;
+}
+
+.pre {
+  white-space: pre-line;
+}
+
+.subQuestions {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.subQuestions-item {
+  padding: 8px;
+  margin: 8px 0;
+  border: 1px solid;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.right-select,
+.right-select:focus,
+.right-select:active {
+  border-color: green;
+  outline-color: green;
+  border-width: 2px;
+}
+
+.wrong-select,
+.wrong-select:focus,
+.wrong-select:active {
+  border-color: red;
+  outline-color: red;
+  border-width: 2px;
 }
 
 @media (max-width: 600px) {

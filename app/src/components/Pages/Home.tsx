@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import store from "src/store/store";
 
 const Home = observer(() => {
-  let { changeNumberQuestions, numberQuestions, start, typeQuestions, changeTest, search, 
-    maxNumberQuestions, inputNumberQuestionsValue, blurNumberQuestions } = store;
+  let { changeNumberQuestions, start, typeQuestions, changeTest, dataQuestions,
+    isCanSelect, numberQuestions, maxNumberQuestions,
+    rangeNumberQuestions, changeRangeNumberQuestions } = store;
   let dataTypeQuestions = Object.entries(typeQuestions);
 
   return (
@@ -23,6 +24,33 @@ const Home = observer(() => {
               )
             })
           }
+          {isCanSelect ? (
+              <div>
+                <div>
+                  <label htmlFor="start">С</label>
+                  <input type="number" name="start" id="start" value={rangeNumberQuestions.start} 
+                    onChange={(e) => changeRangeNumberQuestions(e, "start")}/>
+                </div>
+                <div>
+                  <label htmlFor="end">По</label>
+                  <input type="number" name="end" id="end" value={rangeNumberQuestions.end}
+                    onChange={(e) => changeRangeNumberQuestions(e, "end")}/>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <input 
+                  type="number" 
+                  min="1" 
+                  max={maxNumberQuestions} 
+                  id="number"
+                  onChange={changeNumberQuestions} 
+                  value={numberQuestions}
+                />
+                <label htmlFor="number">Выберите количество вопросов</label>
+              </div>
+            )
+          }
         </form>
       </div>
       <div>
@@ -32,18 +60,6 @@ const Home = observer(() => {
         <Link to="/answers">
           <button>Посмотреть вопросы и ответы</button>
         </Link>
-      </div>
-      <div>
-        <input 
-          type="number" 
-          min="1" 
-          max={maxNumberQuestions} 
-          id="number"
-          onChange={changeNumberQuestions} 
-          onBlur={blurNumberQuestions}
-          value={inputNumberQuestionsValue}
-        />
-        <label htmlFor="number">Выберите количество вопросов</label>
       </div>
     </div>
   )
